@@ -1,33 +1,45 @@
-from flask_admin import Admin
+"""Flask-Admin setup. Import and call init_admin(app) from app.py."""
+from flask import redirect, session, url_for
+from flask_admin import Admin, AdminIndexView, expose
 from flask_admin.contrib.sqla import ModelView
+
 from models import db, Anime, Episode
-from scraper import scrape_anime_data, get_video_source
 
-class EpisodeInline(ModelView):
-    can_create = True
-    can_edit = True
-    can_delete = True
-    column_list = ('episode_number', 'is_available')
 
-class AnimeModelView(ModelView):
-    # Custom Column List
-    column_list = ('title', 'slug', 'status', 'created_at')
-    form_excluded_columns = ('episodes',) # We handle episodes separately or via inline
-    
-    # Custom Create Form to allow URL Input
-    def create_form(self):
-        form = super().create_form()
-        # Add a custom field for HiAnime URL if you want manual trigger
-        form.url_field = self._get_url_field()
-        return form
+class SecureAdminIndexView(AdminIndexView):
+    @expose("/")
+    def index(self):
+        if not session.get("admin_authenticated"):
+            return redirect(url_for("admin_login"))
+        return super().index()
 
-    def on_model_change(self, form, model, is_created):
-        if is_created:
-            # If you have a URL field in your admin form, scrape it automatically
-            # This part assumes you added a 'source_url' field to your admin form
-            pass 
+    def is_accessible(self):
+        return bool(session.get("admin_authenticated"))
 
-# Initialize Admin
-admin = Admin(name='Anime Dashboard', template_mode='bootstrap4')
-admin.add_view(ModelView(Anime, db.session, category='Content'))
-admin.add_view(ModelView(Episode, db.session, category='Content'))
+    def inaccessible_callback(self, name, **kwargs):
+        return redirect(url_for("admin_login", next="/admin/"))
+
+
+class SecureModelView(ModelView):
+    can_view_details = True
+    page_size = 30
+
+    def is_accessible(self):
+        return bool(session.get("admin_authenticated"))
+
+    def inaccessible_callback(self, name, **kwargs):
+        return redirect(url_for("admin_login"))
+
+
+def init_admin(app):
+    admin = Admin(
+        app, name="AnimeZone Admin", index_view=SecureAdminIndexView(),
+        template_mode="bootstrap4"
+    )
+    admin.add_view(SecureModelView(Anime, db.session, category="Catalog"))
+    admin.add_view(SecureModelView(Episode, db.session, category="Catalog"))
+    return admin
+
+
+# Backwards-compatible exported object; app.py initializes its own bound admin.
+admin = None
