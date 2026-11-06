@@ -1,0 +1,6 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>AnimeZone Admin</title>
+<style>body{background:#090b12;color:#f5f7fb;font:15px system-ui;margin:0}.wrap{max-width:900px;margin:40px auto;padding:20px}.stats{display:flex;gap:14px;flex-wrap:wrap}.stat{background:#171c2a;padding:24px;border-radius:12px;min-width:170px}.num{font-size:30px;font-weight:bold;color:#ff6680}a{color:#ff9eae}</style></head><body><main class="wrap"><a href="/">← Website</a> · <a href="/admin/logout">Logout</a><h1>Admin Dashboard</h1>
+<div class="stats"><div class="stat">Anime <div class="num">{{ anime_count }}</div></div><div class="stat">Episodes <div class="num">{{ episode_count }}</div></div></div>
+<h2>Catalog management</h2><p><a href="/admin/">Open Flask-Admin data manager →</a></p>
+<p>Jikan metadata sync endpoint: <code>POST /admin/sync-jikan/&lt;mal_id&gt;</code></p>
+</main></body></html>

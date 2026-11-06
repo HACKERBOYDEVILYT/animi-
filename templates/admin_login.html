@@ -1,0 +1,4 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Admin Login</title>
+<style>body{background:#090b12;color:white;font:15px system-ui;display:grid;place-items:center;min-height:100vh}.box{background:#171c2a;padding:28px;border-radius:14px;width:min(360px,90vw)}input,button{width:100%;padding:12px;margin:8px 0;border-radius:8px;border:1px solid #394157;background:#0d111b;color:white}button{background:#ff365d;border:0;font-weight:bold}</style></head>
+<body><form class="box" method="post"><h2>AnimeZone Admin</h2>{% with messages=get_flashed_messages() %}{% for message in messages %}<p>{{ message }}</p>{% endfor %}{% endwith %}
+<input name="username" placeholder="Username" required autocomplete="username"><input name="password" type="password" placeholder="Password" required autocomplete="current-password"><button>Sign in</button><a href="/">← Back to website</a></form></body></html>

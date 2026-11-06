@@ -1,0 +1,17 @@
+<!doctype html><html lang="{{ 'bn' if current_language=='bn' else 'en' }}"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{{ anime.title }} - AnimeZone</title><style>
+body{margin:0;background:#090b12;color:#f5f7fb;font:15px system-ui}a{color:inherit;text-decoration:none}
+main{max-width:1000px;margin:30px auto;padding:0 18px}.hero{display:grid;grid-template-columns:220px 1fr;gap:24px;background:#141824;padding:20px;border-radius:16px}
+img{width:100%;border-radius:10px;max-height:320px;object-fit:cover}h1{margin-top:0}.muted{color:#aab2c2;line-height:1.7}
+.episodes{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;margin-top:18px}
+.ep{background:#1a2030;border:1px solid #30384b;padding:14px;border-radius:9px;text-align:center}
+.ep:hover{border-color:#ff365d}@media(max-width:600px){.hero{grid-template-columns:1fr}.hero img{max-width:180px}}
+</style></head><body><main><a href="/">← AnimeZone</a><section class="hero" style="margin-top:18px">
+<img src="{{ anime.image_url or 'https://placehold.co/400x600?text=Anime' }}" alt="{{ anime.title }}">
+<div><h1>{{ anime.title }}</h1><p class="muted">{{ anime.description or ('বর্ণনা পাওয়া যায়নি' if current_language=='bn' else 'No synopsis available.') }}</p>
+<p>{{ anime.status }} · {{ episodes|length }} {{ 'টি পর্ব' if current_language=='bn' else 'episodes' }}</p></div></section>
+<h2>{{ 'পর্বসমূহ' if current_language=='bn' else 'Episodes' }}</h2>
+{% if episodes %}<div class="episodes">{% for ep in episodes %}<a class="ep" href="{{ url_for('play_episode',anime_id=anime.id,ep_number=ep.episode_number) }}">{{ ep.title or ('Episode ' ~ ep.episode_number) }}</a>{% endfor %}</div>
+{% else %}<p class="muted">{{ 'এখনো কোনো পর্ব যোগ করা হয়নি।' if current_language=='bn' else 'No episodes have been added yet.' }}</p>{% endif %}
+</main></body></html>
