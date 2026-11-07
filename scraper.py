@@ -58,3 +58,83 @@ def get_video_source(anime_id, episode_id):
     if iframe:
         return iframe.get('src')
     return None
+    
+# ==================================================
+# JIKAN API - REQUIRED BY app.py
+# Existing scraper functions remain unchanged.
+# ==================================================
+
+JIKAN_API = "https://api.jikan.moe/v4"
+
+
+def search_jikan(query):
+    query = (query or "").strip()
+
+    if len(query) < 2:
+        return []
+
+    response = requests.get(
+        f"{JIKAN_API}/anime",
+        params={"q": query, "limit": 10},
+        headers=HEADERS if "HEADERS" in globals() else {
+            "User-Agent": "AnimePlatform/1.0"
+        },
+        timeout=15
+    )
+    response.raise_for_status()
+
+    results = response.json().get("data", [])
+
+    return [
+        {
+            "external_id": str(item.get("mal_id")),
+            "title": item.get("title") or "",
+            "image": (
+                item.get("images", {})
+                .get("jpg", {})
+                .get("large_image_url")
+            ),
+            "description": item.get("synopsis") or "",
+            "status": (
+                "Ongoing"
+                if item.get("status") == "Currently Airing"
+                else "Completed"
+            ),
+            "source_name": "jikan"
+        }
+        for item in results
+    ]
+
+
+def get_jikan_anime(mal_id):
+    response = requests.get(
+        f"{JIKAN_API}/anime/{int(mal_id)}/full",
+        headers=HEADERS if "HEADERS" in globals() else {
+            "User-Agent": "AnimePlatform/1.0"
+        },
+        timeout=15
+    )
+    response.raise_for_status()
+
+    item = response.json().get("data")
+
+    if not item:
+        raise ValueError("Anime not found")
+
+    return {
+        "external_id": str(item.get("mal_id")),
+        "title": item.get("title") or "",
+        "image": (
+            item.get("images", {})
+            .get("jpg", {})
+            .get("large_image_url")
+        ),
+        "description": item.get("synopsis") or "",
+        "status": (
+            "Ongoing"
+            if item.get("status") == "Currently Airing"
+            else "Completed"
+        ),
+        "source_name": "jikan"
+    }
+
